@@ -1,0 +1,46 @@
+BANDIT NOTES
+============
+
+Level 0 - 1
+password:  ZjLjTmM6FvvyRnrb2rfNWOZOTa6ip5If
+How I solved it: SSHed in as bandit0, ran ls to fix readme file, ran cat readme to read the password.
+
+BANDIT NOTES
+============
+
+Level 0 → 1
+How I solved it: SSHed in as bandit0, ran ls, found readme file, ran cat readme to read the password.
+
+Level 1 → 2
+How I solved it: File was named -. Used cat ./- to avoid dash being read as a flag
+
+Level 2 → 3
+How I solved it: The name of the file was --spaces in this filename--. I solved it by running cat "./--spaces in this filename--" to account for the fact that it begins with dashes, and that it has spaces in  it
+
+Level 3 → 4
+How I solved it: The file was hidden in a directory called inhere, so I ran cd inhere to get into it, then I ran ls -la to list all files, including hidden ones, found it then read it
+
+Level 4 → 5
+How I solved it: Now the password was stored in the only human readable file in a directory. So I did the usual going inta a directory, then I ran file ./* to show all the types of files, the file I was looking for was an ASCII type file, so I found it, read it and boom, done
+
+Level 5 → 6
+How I solved it: The file had specifications now. It was human readable, exactly 1033 bytes and not execuatable. So I used find . -type f -size 1033c -not -executable. Breaking the commands down what I basically did was say "Hey, for every thing in this directory, search for a file that is exactly 1033 bytes and is not executable" I found it then read it.
+
+Level 6 → 7
+How I solved it: So following up from the specifications task the file was now owned by a user, and also a group, and was 33 bytes in size, so to find the user I used find / -user bandit7 -group bandit6 -size 33c. Now it's interesting to note that '/' after find means search this whole machine, literally everywhere, and alo every file has two owners, a user and a group, it's a simple concept to grasp, like a student and a department. In a school not every department has unlimited access, but the students in a department have unlimited access. that's not all, I was receiving some message errors and cleared it by using 2>/dev/null which meant that 2>/dev/null — This is redirection. Remember > sends output somewhere? Well Linux has two types of output:
+
+Standard output (1) — normal results
+Standard error (2) — error messages
+
+2> means "redirect error messages." /dev/null is a special black hole on Linux — anything sent there disappears permanently.
+So 2>/dev/null means: "throw all error messages in the bin, show me only real results."
+You'll use this constantly in security work to filter noisy output. 
+So basically I was saying: 
+"Search the entire filesystem for files owned by user bandit7, belonging to group bandit6, exactly 33 bytes in size — and hide all permission errors."
+
+Level 7 → 8
+How I solved it:Now the password was stored in a file called data.txt next to the word millionth, so I initially read it using cat but then I got bombarded with millions of lines of text, making it impossible to find millionth. I had to use grep 'millionth' data.text to find it
+
+
+Level 8 → 9
+How I solved it:It was in a file and was the only line of text that occurs once, so I used sort data.txt to arrange them in order so that they all match with their copies, then uniq -u to bring out the line without a duplicate. The command was sort data.txt uniq -u. 
