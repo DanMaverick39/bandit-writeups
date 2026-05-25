@@ -1,13 +1,6 @@
 BANDIT NOTES
 ============
 
-Level 0 - 1
-password:  ZjLjTmM6FvvyRnrb2rfNWOZOTa6ip5If
-How I solved it: SSHed in as bandit0, ran ls to fix readme file, ran cat readme to read the password.
-
-BANDIT NOTES
-============
-
 Level 0 → 1
 How I solved it: SSHed in as bandit0, ran ls, found readme file, ran cat readme to read the password.
 
@@ -21,13 +14,15 @@ Level 3 → 4
 How I solved it: The file was hidden in a directory called inhere, so I ran cd inhere to get into it, then I ran ls -la to list all files, including hidden ones, found it then read it
 
 Level 4 → 5
-How I solved it: Now the password was stored in the only human readable file in a directory. So I did the usual going inta a directory, then I ran file ./* to show all the types of files, the file I was looking for was an ASCII type file, so I found it, read it and boom, done
+How I solved it: Now the password was stored in the only human readable file in a directory. So I did the usual going into a directory, then I ran file ./* to show all the types of files, the file I was looking for was an ASCII type file, so I found it, read it and boom, done
 
 Level 5 → 6
 How I solved it: The file had specifications now. It was human readable, exactly 1033 bytes and not execuatable. So I used find . -type f -size 1033c -not -executable. Breaking the commands down what I basically did was say "Hey, for every thing in this directory, search for a file that is exactly 1033 bytes and is not executable" I found it then read it.
 
 Level 6 → 7
-How I solved it: So following up from the specifications task the file was now owned by a user, and also a group, and was 33 bytes in size, so to find the user I used find / -user bandit7 -group bandit6 -size 33c. Now it's interesting to note that '/' after find means search this whole machine, literally everywhere, and alo every file has two owners, a user and a group, it's a simple concept to grasp, like a student and a department. In a school not every department has unlimited access, but the students in a department have unlimited access. that's not all, I was receiving some message errors and cleared it by using 2>/dev/null which meant that 2>/dev/null — This is redirection. Remember > sends output somewhere? Well Linux has two types of output:
+How I solved it: So following up from the specifications task the file was now owned by a user, and also a group, and was 33 bytes in size, so to find the user I used find / -user bandit7 -group bandit6 
+-size 33c. Now it's interesting to note that '/' after find means search this whole machine, literally everywhere, and alo every file has two owners, a user and a group, it's a simple concept to grasp,
+ like a student and a department. In a school not every department has unlimited access, but the students in a department have unlimited access. that's not all, I was receiving some message errors and cleared it by using 2>/dev/null which meant that 2>/dev/null — This is redirection. Remember > sends output somewhere? Well Linux has two types of output:
 
 Standard output (1) — normal results
 Standard error (2) — error messages
@@ -43,4 +38,43 @@ How I solved it:Now the password was stored in a file called data.txt next to th
 
 
 Level 8 → 9
-How I solved it:It was in a file and was the only line of text that occurs once, so I used sort data.txt to arrange them in order so that they all match with their copies, then uniq -u to bring out the line without a duplicate. The command was sort data.txt uniq -u. 
+How I solved it:It was in a file and was the only line of text that occurs once, so I used sort data.txt to arrange them in order so that they all match with their copies,
+ then uniq -u to bring out the line without a duplicate. The command was sort data.txt uniq -u. 
+
+Level 9 → 10
+How I solved it:The challenge now was that the password stored in the file data.txt in one of the few human-readable strings, preceded by several ‘=’ characters.
+I used strings to scan the file and extract any sequences of readable text, then used grep "===" to extract the lines possessing the hint. strings data.txt | grep "==="
+
+Level 10 → 11
+How I solved it: The password was stored in a file which contained base64 encoded data, so I ran base64 -d filename. and decoded the file
+
+Level 11 → 12
+How I solved it:The password was stored in a file where all lowercase (a-z) and uppercase (A-Z) letters have been rotated by 13 positions. I had to first read and then translate the file using cat <filename> | tr 'a-zA-Z' 'n-za-mN-ZA-M'. This translated them back to the original
+
+
+Level 12 → 13
+How I solved it:Well I gotta be honest, this is the hardest level I've faced and trust me, I've faced a lot of hard levels 😅 okay, maybe not that hard but you know what I mean.
+So the password was in a file that had been converted to a hexdump then compressed multiple times, so essentially I had to convert it back to binary then decompress it.
+But before that, I had to create my own directory, basically a space where I would be alowed to write files, cause bandit's home directory is read-only, it's also good practice to do stuff in a private directory.
+I did this by running mktemp -d, then I moved into it using cd <the directory location> . I now copied the file from the home directory into that temp directory using <cp ~/data.txt .> .Then I started the conversion process.
+Level 12 → 13
+How I solved it:
+1. Created temp directory with mktemp -d
+2. Copied data.txt there with cp ~/data.txt .
+3. Converted hexdump to binary with xxd -r data.txt > data
+4. Used file data to identify compression type
+5. Renamed and decompressed accordingly:
+   - gzip: mv data data.gz → gunzip data.gz
+   - bzip2: mv data data.bz2 → bunzip2 data.bz2
+   - tar: tar -xf data (no renaming needed)
+6. After each decompression ran ls to find new file, then file on it
+7. Repeated until file said ASCII text
+8. cat the final file to get password
+
+Key lessons:
+- tar bundles, gzip/bzip2 compress
+- tar doesn't need renaming, others do
+- file command is your compass throughout
+- xxd -r reverses a hexdump back to binary
+
+* This was my most stressful level so bear with me 🥲
