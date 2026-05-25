@@ -25,7 +25,7 @@ How I solved it: So following up from the specifications task the file was now o
  like a student and a department. In a school not every department has unlimited access, but the students in a department have unlimited access. that's not all, I was receiving some message errors and cleared it by using 2>/dev/null which meant that 2>/dev/null — This is redirection. Remember > sends output somewhere? Well Linux has two types of output:
 
 Standard output (1) — normal results
-Standard error (2) — error messages
+Standard errgithub.com/DanMaverick39/bandit-writeupsgithub.com/DanMaverick39/bandit-writeupsor (2) — error messages
 
 2> means "redirect error messages." /dev/null is a special black hole on Linux — anything sent there disappears permanently.
 So 2>/dev/null means: "throw all error messages in the bin, show me only real results."
@@ -57,8 +57,9 @@ How I solved it:Well I gotta be honest, this is the hardest level I've faced and
 So the password was in a file that had been converted to a hexdump then compressed multiple times, so essentially I had to convert it back to binary then decompress it.
 But before that, I had to create my own directory, basically a space where I would be alowed to write files, cause bandit's home directory is read-only, it's also good practice to do stuff in a private directory.
 I did this by running mktemp -d, then I moved into it using cd <the directory location> . I now copied the file from the home directory into that temp directory using <cp ~/data.txt .> .Then I started the conversion process.
-Level 12 → 13
-How I solved it:
+
+STEP BY STEP
+
 1. Created temp directory with mktemp -d
 2. Copied data.txt there with cp ~/data.txt .
 3. Converted hexdump to binary with xxd -r data.txt > data
