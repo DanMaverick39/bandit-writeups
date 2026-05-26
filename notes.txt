@@ -79,3 +79,50 @@ Key lessons:
 - xxd -r reverses a hexdump back to binary
 
 * This was my most stressful level so bear with me 🥲
+
+Level 13 → 14
+
+Goal: Use a private SSH key found in bandit13's home directory to access bandit14 without a password.
+
+Step 1 — Copy the private key to my local machine
+
+The private key file sshkey.private was sitting in bandit13's home directory on the Bandit server. I couldn't use it directly from the server because Bandit blocks SSH connections made from within itself. I had to copy it to my own machine first using scp — Secure Copy, which transfers files between machines over SSH.
+
+scp -P 2220 bandit13@bandit.labs.overthewire.org:sshkey.private ~/
+
+Breaking this down:
+- scp — securely copy a file between machines
+- -P 2220 — connect on port 2220 (capital P for scp, unlike lowercase p for ssh)
+- bandit13@bandit.labs.overthewire.org — log in as bandit13 on the Bandit server
+- :sshkey.private — the colon separates the server address from the filename. This tells scp which file to grab from bandit13's home directory
+- ~/ — destination, meaning copy it into my local home directory
+
+After running this it asked for bandit13's password, then copied the file to my machine.
+
+Step 2 — Fix the file permissions
+
+When I tried to use the key immediately, SSH refused with a warning:
+
+WARNING: UNPROTECTED PRIVATE KEY FILE!
+Permissions 0640 are too open.
+
+The file had permissions that allowed other users on my system to read it. SSH treats any private key accessible to others as compromised and refuses to use it entirely — even if nobody actually read it, the exposure itself is the problem.
+
+I fixed this by running:
+
+chmod 600 ~/sshkey.private
+
+600 means only I can read and write the file. No one else has any access. SSH was satisfied and allowed the key to be used.
+
+Step 3 — Log into bandit14 using the private key
+
+With the key secured, I connected to bandit14 using the -i flag which tells SSH to use an identity file instead of a password:
+
+ssh -i ~/sshkey.private bandit14@bandit.labs.overthewire.org -p 2220
+
+The -i ~/sshkey.private part says: "use this private key file as my proof of identity — no password needed." The server already had bandit14's matching public key stored. When my private key matched it, access was granted immediately.
+
+Key lessons:
+- scp copies files securely between machines over SSH — same syntax as SSH but with a colon separating server address from filepath
+- Private key files must have chmod 600 permissions or SSH refuses to use them
+- Key-based SSH authentication replaces passwords entirely — this is the professional standard used on every real cloud server
