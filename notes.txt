@@ -141,3 +141,40 @@ Key lessons:
 - nc syntax is used for connecting to services, transferring files, and
 much more.
 - /etc/bandit_pass/bandit14 is where bandit stores all it's passwords.
+
+Level 15 → 16
+Goal: Submit the current level's password to port 30001 on 
+localhost using SSL/TLS encryption.
+
+Steps:
+1. Retrieved current password from /etc/bandit_pass/bandit15
+2. Connected to port 30001 using openssl s_client with -quiet 
+   flag to suppress SSL handshake noise:
+   echo 'password' | openssl s_client -connect localhost:30001 -quiet
+3. Password for next level returned by the service
+
+Key lessons:
+- SSL/TLS is an encryption protocol that creates a secure tunnel 
+  between two machines before transmitting data
+- Regular nc sends plain unencrypted data — services requiring 
+  SSL/TLS will reject it
+- openssl s_client establishes the encrypted connection first 
+  then sends data through it
+- -quiet suppresses verbose SSL handshake output (Which is basically all that happened during the "handshake") — different from 
+  2>/dev/null because it instructs the program itself not to 
+  generate the noise rather than discarding it at shell level
+- https:// websites use SSL/TLS — the S means the connection 
+  is encrypted
+
+Level 16 → 17
+Goal: The credentials for the next level are hidden behind one of five open ports between 31000-32000 on localhost. Find which ports are open, identify which speak SSL/TLS, and submit the current password to the correct one.
+
+Steps:
+1. To find all the listening ports in that range I ran nmap -p 31000-32000 localhost.
+2. I found out that there were 5 listening ports, I now checked to see the ones that didn't have the ssl exception, I ran echo 'password' | nc localhost port on all the ports. I now found the ones that needed the ssl encryption.
+3. I now ran the echo 'password' | openssl s_client -connect localhostt:port -quiet on the 2 that needed it. Then I got the credentials that were needed for the key.
+4. I then had to store it in a file on my local machine using nano ~/bandit16.key, encrypt it cause using a private key would need some restrictions as previously stated usint chmod 600 ~/bandit16.key, then I now SSH'ed into bandit17 using ssh -i ~/bandit16.key bandit17@bandit.labs.overthewire.org -p 2220
+
+Key lessons:
+- nmap is used to list or show all open ports in a given range.
+
