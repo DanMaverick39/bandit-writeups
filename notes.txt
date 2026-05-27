@@ -126,3 +126,18 @@ Key lessons:
 - scp copies files securely between machines over SSH — same syntax as SSH but with a colon separating server address from filepath
 - Private key files must have chmod 600 permissions or SSH refuses to use them
 - Key-based SSH authentication replaces passwords entirely — this is the professional standard used on every real cloud server
+
+Level 14 → 15
+Goal: Retrieve the password by submitting the current level's 
+password to port 30000 on localhost.
+
+Steps:
+1. I had to get the current levels password by running cat /etc/bandit_pass/bandit14 . Bandit typically stores all the passwords for each level here.
+2. After that I now had to send it to another port so that it could receive the password and send the next levels password. I used nc for that. I ran echo 'password' | nc localhost port . This did just that.
+3. Password received, stored and awaiting use.
+
+Key lessons:
+- localhost means the machine I'm currently on.
+- nc syntax is used for connecting to services, transferring files, and
+much more.
+- /etc/bandit_pass/bandit14 is where bandit stores all it's passwords.
