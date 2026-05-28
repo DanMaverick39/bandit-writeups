@@ -172,9 +172,25 @@ Goal: The credentials for the next level are hidden behind one of five open port
 Steps:
 1. To find all the listening ports in that range I ran nmap -p 31000-32000 localhost.
 2. I found out that there were 5 listening ports, I now checked to see the ones that didn't have the ssl exception, I ran echo 'password' | nc localhost port on all the ports. I now found the ones that needed the ssl encryption.
-3. I now ran the echo 'password' | openssl s_client -connect localhostt:port -quiet on the 2 that needed it. Then I got the credentials that were needed for the key.
-4. I then had to store it in a file on my local machine using nano ~/bandit16.key, encrypt it cause using a private key would need some restrictions as previously stated usint chmod 600 ~/bandit16.key, then I now SSH'ed into bandit17 using ssh -i ~/bandit16.key bandit17@bandit.labs.overthewire.org -p 2220
+3. I now ran the echo 'password' | openssl s_client -connect localhost:port -quiet on the 2 that needed it. Then I got the credentials that were needed for the key.
+4. I then had to store it in a file on my local machine using nano ~/bandit16.key, encrypt it cause using a private key would need some restrictions as previously stated using chmod 600 ~/bandit16.key, then I now SSH'ed into bandit17 using ssh -i ~/bandit16.key bandit17@bandit.labs.overthewire.org -p 2220
 
 Key lessons:
 - nmap is used to list or show all open ports in a given range.
 
+Level 17 → 18
+Goal: Find the one line that differs between two files.
+
+Command used:
+diff passwords.old passwords.new
+
+Output breakdown:
+42c42 — line 42 changed between both files
+< line  — belongs to passwords.old
+> line  — belongs to passwords.new
+The > line is the new password.
+
+Key lesson:
+diff compares two files and shows exactly what changed 
+between them. < is file 1, > is file 2, c means changed, 
+a means added, d means deleted.
