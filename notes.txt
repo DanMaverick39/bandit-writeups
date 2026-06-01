@@ -194,3 +194,12 @@ Key lesson:
 diff compares two files and shows exactly what changed 
 between them. < is file 1, > is file 2, c means changed, 
 a means added, d means deleted.
+
+Level 18 → 19
+Goal: Get the password from the readme file in the home directory before .bashrc logs you out 
+
+Command used:
+ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme
+
+Output breakdown:
+So because the bashrc always logged me out before I could have an interactive session with the machine, I had to run the command to read the file immediately I connect to the server.
