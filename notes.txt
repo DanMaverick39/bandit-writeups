@@ -203,3 +203,16 @@ ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme
 
 Output breakdown:
 So because the bashrc always logged me out before I could have an interactive session with the machine, I had to run the command to read the file immediately I connect to the server.
+
+Level 19 → 20
+Goal: Get the password by executing the setuid binary file in the home directory which would give the effective user ID needed to read the file
+
+Command used:
+./bandit20-do cat <filepath>
+
+Output breakdown: 
+So I needed to change my Effective User Binary in order to read the file that contained the password. The setuid file gives effective permissions of a specific user, in this case bandit20 so that I can read a file only bandit20 can. I now execute the setuid binary file and give it a commant to perform which is reading the file containing the password.
+
+Key Lesson:
+- So it's important to know the difference between a User ID (UID) and Effective UID (EUID)
+ .When you run a setuid binary your real UID stays as bandit19 but your effective UID temporarily becomes bandit20. Linux uses the effective UID when checking file permissions.
