@@ -216,3 +216,61 @@ So I needed to change my Effective User Binary in order to read the file that co
 Key Lesson:
 - So it's important to know the difference between a User ID (UID) and Effective UID (EUID)
  .When you run a setuid binary your real UID stays as bandit19 but your effective UID temporarily becomes bandit20. Linux uses the effective UID when checking file permissions.
+
+
+Level 20 → 21
+Goal: Send the password of the previous level to a listener then execute the setuid binaary file to connect to the listener, verify that the password is correct then send the password for the next level.
+
+Steps:
+1. I had to create a listener that I would send the password through. I just created a listener that would be connected to once to do a certain command.
+2. I had to send a message through that listener immediately it connected and I had to keep the listener open, so I ran echo 'password' | nc -l -p 1234 &. This sent the password immediately the listener was connected to it and & kept it open so that it can be connected to.
+3. I now ran ./setuidbinary 1234 so that I could connect to the listener on that port, check the password sent and then send the next password.
+
+Key lessons:
+- & stops the process from terminating if it did in this case the listener would have just terminated.
+
+Level 20 → 22
+Goal: Get the password by checking for the program that is automatically running, by looking in /etc/cron.d for the configuration and see what command is being executed.
+
+Steps:
+1. I entered into the directory by running cd /etc/cron.d/
+2. I then listed the contents using ls
+3. I then spotted and read the file that looked like the level I wanna go to which was  cronjob_bandit22, by running cat cronjob_bandit22.
+4. I was met with this output:
+   @reboot bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+Line 1 — @reboot
+Run this script once every time the server reboots. As soon as the machine starts up, execute the script.
+Line 2 — * * * * *
+The five stars are the cron time format. 
+Each star represents(From left to right):day of week (0-7, 0 and 7 are Sunday)
+                                         month (1-12),
+                                         day of month (1-31)
+                                         hour (0-23)
+                                         minute (0-59)
+-Five stars means every minute of every hour of every day. This script runs every single minute.
+-bandit2:
+The user the script runs as. Cron executes this as bandit22 — meaning it has bandit22's permissions.
+-/usr/bin/cronjob_bandit22.sh:
+The script being executed.
+-&> /dev/null:
+Redirect ALL output — both normal output and errors — to /dev/null. The script runs silently. Nobody sees what it does. &> combines stdout (1) and stderr (2) into one redirect.
+
+The Script Itself
+bash#!/bin/bash
+chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Line 1 — #!/bin/bash
+Tells the system to use bash.
+Line 2 — chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Set permissions on a file in /tmp to 644 — meaning everyone can read it. This is intentional — it makes the password file readable by anyone including you as bandit21.
+Line 3 — cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Read bandit22's password and write it into that /tmp file. Only bandit22 can read /etc/bandit_pass/bandit22 — but the script runs as bandit22 via cron, so it can. Then it dumps the password into a world-readable /tmp file.
+
+The Full Chain
+Every minute cron runs the script as bandit22
+→ Script reads bandit22's password (bandit22 has permission)
+→ Script writes it to /tmp with chmod 644 (everyone can read)
+→ You cat that /tmp file as bandit21
+→ You get the password
+
