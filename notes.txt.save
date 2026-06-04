@@ -244,74 +244,13 @@ Run this script once every time the server reboots. As soon as the machine start
 Line 2 — * * * * *
 The five stars are the cron time format. 
 Each star represents(From left to right):day of week (0-7, 0 and 7 are Sunday)
-                                         month (1-12),
-                                         day of month (1-31)
-                                         hour (0-23)
-                                         minute (0-59)
--Five stars means every minute of every hour of every day. This script runs every single minute.
--bandit2:
-The user the script runs as. Cron executes this as bandit22 — meaning it has bandit22's permissions.
--/usr/bin/cronjob_bandit22.sh:
-The script being executed.
--&> /dev/null:
-Redirect ALL output — both normal output and errors — to /dev/null. The script runs silently. Nobody sees what it does. &> combines stdout (1) and stderr (2) into one redirect.
 
-The Script Itself
-bash#!/bin/bash
-chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
-cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
-Line 1 — #!/bin/bash
-Tells the system to use bash.
-Line 2 — chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
-Set permissions on a file in /tmp to 644 — meaning everyone can read it. This is intentional — it makes the password file readable by anyone including you as bandit21.
-Line 3 — cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
-Read bandit22's password and write it into that /tmp file. Only bandit22 can read /etc/bandit_pass/bandit22 — but the script runs as bandit22 via cron, so it can. Then it dumps the password into a world-readable /tmp file.
+Level 22 → 23 
+Goal: A program is running automatically at regular intervals from cron, the time-based job scheduler.
+Look in /etc/cron.d/ for the configuration and see what command is being executed.                                        month (1-12),
 
-The Full Chain
-Every minute cron runs the script as bandit22
-→ Script reads bandit22's password (bandit22 has permission)
-→ Script writes it to /tmp with chmod 644 (everyone can read)
-→ You cat that /tmp file as bandit21
-→ You get the password
-
-Bandit Level 22 → 23 Summary
-
-Objective:
-Obtain the password for bandit23.
-
-Investigation:
-I examined the cron configuration files in `/etc/cron.d` and found a cron job named `cronjob_bandit23`.
-
-The cron entry showed that the script `/usr/bin/cronjob_bandit23.sh` was executed every minute as the user `bandit23`. The output was redirected to `/dev/null`, meaning it ran silently without displaying output or errors.
-
-Analysis:
-I inspected the contents of `cronjob_bandit23.sh` and discovered that:
-
-1. The script determines the username of the account running it using `whoami`.
-
-2. Since the cron job runs as `bandit23`, the username becomes `bandit23`.
-
-3. The script generates an MD5 hash from the string:
-
-   `I am user bandit23`
-
-4. The resulting hash is used as a filename in `/tmp`.
-
-5. The script copies the contents of `/etc/bandit_pass/bandit23` into `/tmp/<generated_hash>`.
-
-Exploitation:
-Because the filename was generated from a predictable string, I calculated the same MD5 hash manually.
-
-After obtaining the hash value, I read the corresponding file in `/tmp`, which contained the password for `bandit23`.
-
-Key Concepts Learned:
-
-* Cron jobs automate tasks on Linux.
-* Cron jobs can run as different users.
-* Output redirection (`>`, `&>`) and `/dev/null`.
-* Bash variables and command substitution (`$(...)`).
-* Pipes (`|`) for chaining commands.
-* MD5 hashing.
-* Predictable file naming can lead to information disclosure.
-* Understanding automated processes can reveal unintended access paths.
+Steps:
+1.                                         
+                                        
+                                  
 
