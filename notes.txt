@@ -274,7 +274,7 @@ Every minute cron runs the script as bandit22
 → You cat that /tmp file as bandit21
 → You get the password
 
-Bandit Level 22 → 23 Summary
+Level 22 → 23
 
 Objective:
 Obtain the password for bandit23.
@@ -315,3 +315,39 @@ Key Concepts Learned:
 * Predictable file naming can lead to information disclosure.
 * Understanding automated processes can reveal unintended access paths.
 
+
+Level 23 → 24
+Goal: Get the password for the next level by creating a file that cron would execute.
+
+Steps:
+1. So first I went into the directory that had the cron, then I checked for the configuration to see the command being executed.
+2. The command being executed was that every minute, cron went to a particular folder and executed every file in that folder that belonged to me (user bandit23) as bandit24.
+3. So I created a the folder and created a file in that folder that had a bash command in it.
+   The command was to make cron read the contents of the file that had bandit24's password since cron ran as bandit 24, and then send the output to a temp file I created.
+4. Now after doing this, I made the file executable and then waited a bit before reading the temp file that contained the password.
+   I had to wait a bit cause cron had to read and execute the task first, if I read it immediately an error would have occured
+
+Key lessons:
+- It's important to understand how to read and write shell scripts in order to detext and exploit escalations.
+
+Levels 23 → 25  summary
+
+Key Concept: Exploiting Cron Jobs for Privilege Escalation
+
+Level 23: Reading Cron Output
+- Cron runs script as bandit23 every minute
+- Script hashes username and writes password to /tmp/[hash]
+- We calculate the hash ourselves and read the output
+
+Level 24: Writing to Cron Input
+- Cron checks /var/spool/bandit24/foo/ every minute
+- Executes any script owned by bandit23 that we put there
+- Our script runs as bandit24, reads bandit24's password
+- Script writes password to /tmp for us to read
+
+Core Lesson: Cron jobs running as privileged users can be exploited if they:
+- Execute files from world-writable directories
+- Execute files we can create or modify
+- Run as a higher-privilege user than us
+
+Security Principle: This is privilege escalation via script injection.
