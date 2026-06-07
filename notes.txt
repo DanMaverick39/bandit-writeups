@@ -59,7 +59,7 @@ But before that, I had to create my own directory, basically a space where I wou
 I did this by running mktemp -d, then I moved into it using cd <the directory location> . I now copied the file from the home directory into that temp directory using <cp ~/data.txt .> .Then I started the conversion process.
 
 STEP BY STEP
-
+iCi86ttT4KSNe1armKiwbQNmB3YJP3q4
 1. Created temp directory with mktemp -d
 2. Copied data.txt there with cp ~/data.txt .
 3. Converted hexdump to binary with xxd -r data.txt > data
@@ -330,7 +330,7 @@ Steps:
 Key lessons:
 - It's important to understand how to read and write shell scripts in order to detext and exploit escalations.
 
-Levels 23 → 25  summary
+Levels 23 → 24  summary
 
 Key Concept: Exploiting Cron Jobs for Privilege Escalation
 
@@ -351,3 +351,54 @@ Core Lesson: Cron jobs running as privileged users can be exploited if they:
 - Run as a higher-privilege user than us
 
 Security Principle: This is privilege escalation via script injection.
+
+Level 24 → 25
+Goal: Send the password of bandit24 and a secret numeric 4-digit code to a daemon listening on port 30002, the password for bandit25 would now be sent back
+
+Steps:
+There is no way to retrieve the pincode except by going through all of the 10000 combinations, called brute-forcing.
+
+1. I had to create a bash script that would send the password and all 10000 possible 4-digit codes. I created the bash script in a text file in the temp directory, so I ran nano /tmp/brutforce.sh to create this file.
+2. I then wrote the bash script to do this:
+   #!/bin/bash
+for pin in {0000..9999}; do
+    echo "password $pin"
+done | nc localhost 30002
+
+This means that for a variable pin in the range 0000 to 9999, do the command of sending the password and the generated pin, when all the possible combinations are generated, now pipe it all to port 30002
+
+3. After writing this script, I made it executable by running chmod +x <filepath> 
+4. I now executed it by running bash <filepath>
+5. All the iterations went through and eventually one combination matched and the password was returned
+
+Key Lessons:
+It's important to understand how to write scripts that solve problems, especially one that needs a task repeated
+
+
+Level 25 → 26
+Goal: SSH into bandit26 using the SSH key found in bandit25
+
+Steps:
+1. Found bandit26.sshkey file in bandit25 home directory
+2. Copied it to local machine with scp
+3. Set permissions to 600 with chmod
+4. Attempted SSH into bandit26@localhost:2220 with the key
+5. Got stuck — a restricted shell program (showtext) ran instead of bash
+6. Couldn't escape the restricted shell due to server-side restrictions
+7. Moved to next phase of learning
+
+Key Concepts:
+- SSH keys are stored in user home directories
+- Some systems run restricted shells instead of bash
+- Restricted shells intentionally block direct terminal access
+- This is a security containment technique
+
+Lessons:
+- Restricted shells exist and are a real thing
+- Need to understand shell escape techniques (vi, pagers) to bypass them
+- Server had resource constraints that prevented completing this level
+
+
+>>>Now due to some server restrictions I couldn't finish the bandit game 😩
+I went through 25 and a half levels and I'm grateful of what I could learn so far 🤲
+Off to the next phase of learning now 😄 this has been fun, and thanks for those who followed 😜
